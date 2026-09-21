@@ -6,11 +6,10 @@ import urllib.parse
 # 1. Configuración de página
 st.set_page_config(page_title="SIMI RRHH", page_icon="👥", layout="wide")
 
-# 2. Conexión a la base de datos Neon con SQLAlchemy directo
+# 2. Conexión a la base de datos Neon
 @st.cache_resource
 def get_engine():
     db_url = st.secrets["DATABASE_URL"]
-    # Asegurar que use el dialecto correcto para postgresql
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
     elif db_url.startswith("postgresql://"):
@@ -44,7 +43,7 @@ with tab_personal:
                 st.success("¡Empleado agregado correctamente!")
                 st.rerun()
             except Exception as e:
-                st.error(f"Error al guardar: {e}")
+                st.error(f"Error al guardar en la base de datos: {e}")
 
     st.subheader("Lista de Empleados")
     try:
@@ -52,9 +51,9 @@ with tab_personal:
         if not df_empleados.empty:
             st.dataframe(df_empleados[['nombre', 'correo', 'cargo']], use_container_width=True)
         else:
-            st.info("No hay empleados registrados aún.")
+            st.info("No hay empleados registrados aún. ¡Agrega el primero arriba!")
     except Exception as e:
-        st.info("Configura o verifica tus tablas en la base de datos.")
+        st.error(f"Detalle técnico (para verificar la tabla): {e}")
 
 # --- PESTAÑA 2: TURNOS Y ASISTENCIA ---
 with tab_turnos:
